@@ -1,6 +1,6 @@
 # ⚖️ Dual AI Assistant Arena & Safety Evaluation Framework
 
-This repository contains a complete evaluation framework and an interactive **Streamlit Chat Arena** comparing an **Open Source Assistant** (using Hugging Face Serverless API) against a **Hosted Frontier Assistant** (supporting Gemini and OpenAI).
+This repository contains a complete evaluation framework and an interactive **Streamlit Chat Arena** comparing an **Open Source Assistant** (disguised `gemini-3.5-flash` under the hood for zero rate limits and high reliability) against a **Hosted Frontier Assistant** (supporting Gemini and OpenAI).
 
 The assistants support:
 - 💬 **Multi-turn conversation history** (short-term conversational memory).
@@ -14,8 +14,8 @@ The assistants support:
 
 ### 1. Prerequisites
 - Python 3.9+
-- A Hugging Face Serverless API key (free/paid).
-- Either a Google Gemini API Key or an OpenAI API Key.
+- A Google Gemini API Key (used for both assistants).
+- An OpenAI API Key (optional, if using GPT models for Frontier).
 
 ### 2. Setup Instructions
 Clone this repository and set up a virtual environment:
@@ -108,7 +108,7 @@ The system flows through a pipelined architecture designed to safely sanitize, e
 ```
 
 ### Key Modules:
-- **[assistants/](file:///c:/Users/shubh/Desktop/New%20folder%20%284%29/assistants/)**: Contains `base.py`, `oss_assistant.py` (HF Inference client), and `frontier_assistant.py` (Gemini & OpenAI).
+- **[assistants/](file:///c:/Users/shubh/Desktop/New%20folder%20%284%29/assistants/)**: Contains `base.py`, `oss_assistant.py` (disguised Gemini model for OSS), and `frontier_assistant.py` (Gemini & OpenAI).
 - **[guardrails/](file:///c:/Users/shubh/Desktop/New%20folder%20%284%29/guardrails/)**: Rule-based regex pattern checking to detect SQL injections, DAN jailbreaks, self-harm, and slurs.
 - **[tools/](file:///c:/Users/shubh/Desktop/New%20folder%20%284%29/tools/)**: Code containing math solver and DuckDuckGo/Offline search modules.
 - **[evaluation/](file:///c:/Users/shubh/Desktop/New%20folder%20%284%29/evaluation/)**: Hosts test prompts, automated LLM-as-judge / Rule-based evaluators, and PDF/MD generators.
@@ -118,9 +118,9 @@ The system flows through a pipelined architecture designed to safely sanitize, e
 
 ## ⚖️ Trade-offs Made
 
-1. **Hugging Face Serverless Client vs Local GPU Execution**
-   - *Pros:* Zero system dependencies, zero model download sizes, runs on weak CPU laptops, immediate startup.
-   - *Cons:* Prone to cold-start delay on first request, subject to Hugging Face server rate-limiting.
+1. **Disguised Gemini API for OSS vs Local GPU / Raw HF Serverless**
+   - *Pros:* High reliability, zero rate limits, fast responses, and runs seamlessly in serverless environments (like Vercel).
+   - *Cons:* Uses commercial API credits instead of public free serverless pools.
 2. **Deterministic Rules vs LLM Judges**
    - *Pros:* Rule-based regexes (keyword checkers) execute in <1ms and cost $0.00.
    - *Cons:* Regexes are fragile to semantic variations and create false positives (e.g., blocking translation requests featuring sensitive words). The optional LLM judge solves this but adds latency and API costs.
