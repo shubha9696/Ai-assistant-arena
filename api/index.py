@@ -152,7 +152,8 @@ def run_chat_arena(req: ChatRequest):
         frontier_key = os.getenv("GEMINI_API_KEY") if is_gemini else os.getenv("OPENAI_API_KEY")
         
     # Instantiate models
-    oss_assistant = OpenSourceAssistant(model_name=req.oss_model, api_key=hf_token, system_prompt=req.system_prompt)
+    resolved_gemini_key = req.gemini_key or os.getenv("GEMINI_API_KEY")
+    oss_assistant = OpenSourceAssistant(model_name=req.oss_model, api_key=hf_token, system_prompt=req.system_prompt, gemini_api_key=resolved_gemini_key)
     frontier_assistant = FrontierAssistant(model_name=req.frontier_model, api_key=frontier_key, system_prompt=req.system_prompt)
     
     # 4. Generate Responses & Apply Output Guardrails

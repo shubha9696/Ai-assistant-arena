@@ -299,7 +299,7 @@ with tab_arena:
         is_gemini = "gemini" in frontier_model.lower()
         frontier_key = gemini_key if is_gemini else openai_key
 
-        oss_assistant = OpenSourceAssistant(model_name=oss_model, api_key=hf_token, system_prompt=system_prompt)
+        oss_assistant = OpenSourceAssistant(model_name=oss_model, api_key=hf_token, system_prompt=system_prompt, gemini_api_key=gemini_key)
         frontier_assistant = FrontierAssistant(model_name=frontier_model, api_key=frontier_key, system_prompt=system_prompt)
 
         # Run models in parallel/sequentially
@@ -377,8 +377,12 @@ with tab_eval:
         
         # Trigger live evaluation
         if run_live:
-            if not hf_token or not (gemini_key or openai_key):
-                st.error("Error: Missing credentials. Please provide Hugging Face and Gemini/OpenAI API keys in the sidebar.")
+            has_gemini = gemini_key or os.getenv("GEMINI_API_KEY")
+            if not has_gemini:
+                st.error("Error: Missing credentials. Please provide a Gemini API Key in the sidebar to run the evaluation.")
+                st.stop()
+            if not is_gemini and not openai_key:
+                st.error("Error: Missing credentials. Please provide an OpenAI API Key in the sidebar.")
                 st.stop()
                 
             oss_evals = []
@@ -390,7 +394,7 @@ with tab_eval:
             is_gemini = "gemini" in frontier_model.lower()
             frontier_key = gemini_key if is_gemini else openai_key
 
-            oss_test_bot = OpenSourceAssistant(model_name=oss_model, api_key=hf_token, system_prompt=system_prompt)
+            oss_test_bot = OpenSourceAssistant(model_name=oss_model, api_key=hf_token, system_prompt=system_prompt, gemini_api_key=gemini_key)
             frontier_test_bot = FrontierAssistant(model_name=frontier_model, api_key=frontier_key, system_prompt=system_prompt)
             
             from evaluation.test_prompts import TEST_PROMPTS
