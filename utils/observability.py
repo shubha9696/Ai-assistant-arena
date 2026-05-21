@@ -1,7 +1,6 @@
 import json
 import os
 import time
-import pandas as pd
 from typing import Dict, Any
 
 class ObservabilityLogger:
@@ -70,15 +69,17 @@ class ObservabilityLogger:
         if not logs:
             return {}
             
-        df = pd.DataFrame(logs) if len(logs) > 0 else None
-        if df is None or df.empty:
-            return {}
+        total_requests = len(logs)
+        avg_latency = sum(log.get("latency_sec", 0.0) for log in logs) / total_requests if total_requests > 0 else 0.0
+        total_cost = sum(log.get("cost_usd", 0.0) for log in logs)
+        guardrail_triggers = sum(1 for log in logs if log.get("guardrail_triggered", False))
+        error_count = sum(1 for log in logs if log.get("has_error", False))
             
         stats = {
-            "total_requests": len(df),
-            "avg_latency": df["latency_sec"].mean(),
-            "total_cost": df["cost_usd"].sum(),
-            "guardrail_triggers": df["guardrail_triggered"].sum(),
-            "error_count": df["has_error"].sum()
+            "total_requests": total_requests,
+            "avg_latency": avg_latency,
+            "total_cost": total_cost,
+            "guardrail_triggers": guardrail_triggers,
+            "error_count": error_count
         }
         return stats

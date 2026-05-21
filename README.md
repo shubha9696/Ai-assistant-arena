@@ -28,7 +28,7 @@ venv\Scripts\activate
 source venv/bin/activate
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -r requirements-local.txt
 ```
 
 ### 3. Set up Environment Variables
