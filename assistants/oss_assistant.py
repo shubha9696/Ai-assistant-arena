@@ -9,8 +9,11 @@ class OpenSourceAssistant(BaseAssistant):
     """
     def __init__(self, model_name: str = "Qwen/Qwen2.5-7B-Instruct", api_key: str = None, system_prompt: str = None):
         super().__init__(model_name, api_key, system_prompt)
-        # Use Hugging Face serverless client
-        self.client = InferenceClient(model=self.model_name, token=self.api_key)
+        import os
+        token = self.api_key if self.api_key else os.getenv("HF_TOKEN")
+        if not token:
+            token = None
+        self.client = InferenceClient(model=self.model_name, token=token)
 
     def generate_response(self, prompt: str, history: List[Dict[str, str]], **kwargs) -> Dict[str, Any]:
         start_time = time.time()

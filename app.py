@@ -6,6 +6,10 @@ import json
 import os
 import time
 import re
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Import custom modules
 from assistants.oss_assistant import OpenSourceAssistant
@@ -157,7 +161,7 @@ with st.sidebar.expander("🤖 Model Selection", expanded=True):
     
     frontier_model = st.selectbox(
         "Frontier Model",
-        ["gemini-1.5-flash", "gemini-1.5-pro", "gpt-4o-mini", "gpt-4o"],
+        ["gemini-2.5-flash", "gemini-flash-latest", "gemini-1.5-flash", "gemini-1.5-pro", "gpt-4o-mini", "gpt-4o"],
         index=0
     )
     
@@ -292,8 +296,11 @@ with tab_arena:
             frontier_memory.append({"role": "assistant", "content": past["frontier"]})
 
         # Instantiation
+        is_gemini = "gemini" in frontier_model.lower()
+        frontier_key = gemini_key if is_gemini else openai_key
+
         oss_assistant = OpenSourceAssistant(model_name=oss_model, api_key=hf_token, system_prompt=system_prompt)
-        frontier_assistant = FrontierAssistant(model_name=frontier_model, api_key=gemini_key or openai_key, system_prompt=system_prompt)
+        frontier_assistant = FrontierAssistant(model_name=frontier_model, api_key=frontier_key, system_prompt=system_prompt)
 
         # Run models in parallel/sequentially
         with st.spinner("🧠 Querying Assistants..."):
@@ -380,8 +387,11 @@ with tab_eval:
             status_text = st.empty()
             
             # Instantiations
+            is_gemini = "gemini" in frontier_model.lower()
+            frontier_key = gemini_key if is_gemini else openai_key
+
             oss_test_bot = OpenSourceAssistant(model_name=oss_model, api_key=hf_token, system_prompt=system_prompt)
-            frontier_test_bot = FrontierAssistant(model_name=frontier_model, api_key=gemini_key or openai_key, system_prompt=system_prompt)
+            frontier_test_bot = FrontierAssistant(model_name=frontier_model, api_key=frontier_key, system_prompt=system_prompt)
             
             from evaluation.test_prompts import TEST_PROMPTS
             total_prompts = len(TEST_PROMPTS)

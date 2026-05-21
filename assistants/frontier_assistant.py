@@ -7,7 +7,7 @@ class FrontierAssistant(BaseAssistant):
     """
     Assistant implementation utilizing hosted frontier models from Google Gemini or OpenAI.
     """
-    def __init__(self, model_name: str = "gemini-1.5-flash", api_key: str = None, system_prompt: str = None):
+    def __init__(self, model_name: str = "gemini-flash-latest", api_key: str = None, system_prompt: str = None):
         super().__init__(model_name, api_key, system_prompt)
         self.provider = "google" if "gemini" in model_name.lower() else "openai"
         self.client = None
